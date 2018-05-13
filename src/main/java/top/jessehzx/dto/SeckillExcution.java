@@ -1,6 +1,7 @@
 package top.jessehzx.dto;
 
 import top.jessehzx.entity.SuccessKilled;
+import top.jessehzx.enums.SeckillStatEnum;
 
 /**
  * 封装秒杀执行结果
@@ -17,10 +18,10 @@ public class SeckillExcution {
 
     private SuccessKilled successKilled;
 
-    public SeckillExcution(long seckillId, int state, String stateInfo, SuccessKilled successKilled) {
+    public SeckillExcution(long seckillId, SeckillStatEnum statEnum, SuccessKilled successKilled) {
         this.seckillId = seckillId;
-        this.state = state;
-        this.stateInfo = stateInfo;
+        this.state = statEnum.getState();
+        this.stateInfo = statEnum.getStateInfo();
         this.successKilled = successKilled;
     }
 
@@ -30,10 +31,10 @@ public class SeckillExcution {
      * @param state
      * @param stateInfo
      */
-    public SeckillExcution(long seckillId, int state, String stateInfo) {
+    public SeckillExcution(long seckillId, SeckillStatEnum statEnum) {
         this.seckillId = seckillId;
-        this.state = state;
-        this.stateInfo = stateInfo;
+        this.state = statEnum.getState();
+        this.stateInfo = statEnum.getStateInfo();
     }
 
     public long getSeckillId() {

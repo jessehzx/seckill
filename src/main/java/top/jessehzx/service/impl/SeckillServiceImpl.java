@@ -2,6 +2,8 @@ package top.jessehzx.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import top.jessehzx.dao.SeckillDao;
 import top.jessehzx.dao.SuccessKilledDao;
@@ -9,6 +11,7 @@ import top.jessehzx.dto.Exposer;
 import top.jessehzx.dto.SeckillExcution;
 import top.jessehzx.entity.Seckill;
 import top.jessehzx.entity.SuccessKilled;
+import top.jessehzx.enums.SeckillStatEnum;
 import top.jessehzx.exception.RepeatKillException;
 import top.jessehzx.exception.SeckillCloseException;
 import top.jessehzx.exception.SeckillException;
@@ -21,14 +24,17 @@ import java.util.List;
  * @author jessehzx
  * @date 2018/5/13
  */
+@Service
 public class SeckillServiceImpl implements SeckillService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SeckillServiceImpl.class);
 
     private static final String slat = "jgoeijgrj@Q$%%U(JGoewh9t";
 
+    @Autowired
     private SeckillDao seckillDao;
 
+    @Autowired
     private SuccessKilledDao successKilledDao;
 
     public List<Seckill> getSeckillList() {
@@ -87,7 +93,7 @@ public class SeckillServiceImpl implements SeckillService {
                     // 秒杀成功
                     SuccessKilled sk = successKilledDao.queryByIdWithSeckill(seckillId, userPhone);
                     if (null != sk) {
-                        return new SeckillExcution(seckillId, 1, "秒杀成功", sk);
+                        return new SeckillExcution(seckillId, SeckillStatEnum.SUCCESS, sk);
                     }
 
                 }
