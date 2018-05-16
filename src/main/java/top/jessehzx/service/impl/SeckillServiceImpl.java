@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import top.jessehzx.dao.SeckillDao;
 import top.jessehzx.dao.SuccessKilledDao;
+import top.jessehzx.dao.cache.RedisDao;
 import top.jessehzx.dto.Exposer;
 import top.jessehzx.dto.SeckillExcution;
 import top.jessehzx.entity.Seckill;
@@ -37,6 +38,9 @@ public class SeckillServiceImpl implements SeckillService {
     @Autowired
     private SuccessKilledDao successKilledDao;
 
+    @Autowired
+    private RedisDao redisDao;
+
     public List<Seckill> getSeckillList() {
         return seckillDao.queryAll(0, 4);
     }
@@ -46,10 +50,20 @@ public class SeckillServiceImpl implements SeckillService {
     }
 
     public Exposer exportSeckillUrl(long seckillId) {
-        Seckill seckill = seckillDao.queryById(seckillId);
+        // 优化点：缓存优化
+        // 1:先去访问redis
+        Seckill seckill = redisDao.getSeckill(seckillId);
         if (null == seckill) {
-            return new Exposer(false, seckillId);
+            // 2:访问数据库
+            seckill = seckillDao.queryById(seckillId);
+            if (null == seckill) {
+                return new Exposer(false, seckillId);
+            } else {
+                // 3:放进redis
+                redisDao.putSeckill(seckill);
+            }
         }
+
         Date startTime = seckill.getStartTime();
         Date endTime = seckill.getEndTime();
         Date nowTime = new Date();
