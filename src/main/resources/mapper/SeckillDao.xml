@@ -32,4 +32,9 @@
         order by create_time DESC
         limit #{offset}, #{limit}
     </select>
+
+    <!-- MyBatis调用存储过程 -->
+    <select id="killByProcedure" statementType="CALLABLE">
+        call execute_seckill
+    </select>
 </mapper>

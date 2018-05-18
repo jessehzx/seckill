@@ -124,4 +124,13 @@ public class SeckillServiceImpl implements SeckillService {
 
         return null;
     }
+
+    public SeckillExcution excuteSeckillProcedure(long seckillId, long userPhone, String md5) {
+        if (null == md5 && !md5.equals(getMD5(seckillId))) {
+            return new SeckillExcution(seckillId, SeckillStatEnum.DATA_REWRITE);
+        }
+        Date killTime = new Date();
+
+        return null;
+    }
 }

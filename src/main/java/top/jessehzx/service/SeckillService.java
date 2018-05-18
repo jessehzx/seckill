@@ -40,10 +40,24 @@ public interface SeckillService {
     /**
      * 执行秒杀
      * 通过exportSeckillUrl先暴露md5，这里带上md5值，和我们业务逻辑中计算的不一致，表示用户秒杀url被篡改了，我们会拒绝执行秒杀
-     * @param seckill
+     * 通过异常去告诉Spring的声明式事务，去执行提交还是回滚
+     * @param seckillId
      * @param userPhone
      * @param md5
      */
-    SeckillExcution excuteSeckill(long seckill, long userPhone, String md5)
+    SeckillExcution excuteSeckill(long seckillId, long userPhone, String md5)
         throws SeckillException,RepeatKillException,SeckillCloseException;
+
+    /**
+     * 执行秒杀 by 存储过程
+     * @param seckillId
+     * @param userPhone
+     * @param md5
+     * @return
+     * @throws SeckillException
+     * @throws RepeatKillException
+     * @throws SeckillCloseException
+     */
+    SeckillExcution excuteSeckillProcedure(long seckillId, long userPhone, String md5);
+
 }
