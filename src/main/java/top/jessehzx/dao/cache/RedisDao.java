@@ -29,7 +29,7 @@ public class RedisDao {
     public Seckill getSeckill(long seckillId) {
         // redis操作逻辑
         try {
-            Jedis jedis = jedisPool.getResource();
+            Jedis jedis = jedisPool.getResource(); // jedisPool相当于数据库的连接池,jedis相当于connection
             try {
                 // 并没有实现内部序列化操作
                 // get byte[] ->反序列化-> Object(Seckill)

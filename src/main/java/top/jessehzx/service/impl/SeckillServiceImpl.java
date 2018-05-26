@@ -50,7 +50,7 @@ public class SeckillServiceImpl implements SeckillService {
     }
 
     public Exposer exportSeckillUrl(long seckillId) {
-        // 优化点：缓存优化
+        // 优化点：缓存优化：超时的基础上维护一致性
         // 1:先去访问redis
         Seckill seckill = redisDao.getSeckill(seckillId);
         if (null == seckill) {
