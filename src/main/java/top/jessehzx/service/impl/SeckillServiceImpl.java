@@ -91,27 +91,33 @@ public class SeckillServiceImpl implements SeckillService {
         // 执行秒杀逻辑：减库存+记录购买行为
         Date nowTime = new Date();
 
+        /**
+         * 简单优化：
+         * 把顺序调整之后，可以把网络延迟和GC对性能的干扰减少一半。
+         * 因为干扰主要出现在：减库存（热点商品竞争），等待行级锁释放+干扰，对性能的影响。
+         * 记录购买行为，因为使用了联合主键（手机号+商品ID）和insert ignore into ...会帮我们挡住一大部分的重复秒杀。
+         */
         try {
-            // 减库存
-            int updateCount = seckillDao.reduceNumber(seckillId, nowTime);
-            if (updateCount <= 0) {
-                // 没有减库存，说明秒杀已经结束
-                throw new SeckillCloseException("seckill is end");
+            // 记录购买行为
+            int insertCount = successKilledDao.insertSuccessKilled(seckillId, userPhone);
+            if (insertCount <= 0) {
+                // 重复秒杀
+                throw new RepeatKillException("repeat seckill");
             } else {
-                // 记录购买行为
-                int insertCount = successKilledDao.insertSuccessKilled(seckillId, userPhone);
-                if (insertCount <= 0) {
-                    // 重复秒杀
-                    throw new RepeatKillException("repeat seckill");
+                // 减库存
+                int updateCount = seckillDao.reduceNumber(seckillId, nowTime);
+                if (updateCount <= 0) {
+                    // 减库存失败，说明秒杀已经结束或没有库存了。rollback
+                    throw new SeckillCloseException("seckill is end");
                 } else {
-                    // 秒杀成功
+                    // 秒杀成功。commit
                     SuccessKilled sk = successKilledDao.queryByIdWithSeckill(seckillId, userPhone);
                     if (null != sk) {
                         return new SeckillExcution(seckillId, SeckillStatEnum.SUCCESS, sk);
                     }
-
                 }
             }
+
         } catch (SeckillCloseException e1) {
             throw e1;
         } catch (RepeatKillException e2) {
