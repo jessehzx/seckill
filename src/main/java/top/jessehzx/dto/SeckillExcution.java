@@ -28,8 +28,7 @@ public class SeckillExcution {
     /**
      * 构造方法。失败的时候，就没有秒杀成功Entity了
      * @param seckillId
-     * @param state
-     * @param stateInfo
+     * @param statEnum
      */
     public SeckillExcution(long seckillId, SeckillStatEnum statEnum) {
         this.seckillId = seckillId;
