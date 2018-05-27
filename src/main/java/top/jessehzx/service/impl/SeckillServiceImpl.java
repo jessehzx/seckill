@@ -1,5 +1,6 @@
 package top.jessehzx.service.impl;
 
+import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,9 @@ import top.jessehzx.exception.SeckillException;
 import top.jessehzx.service.SeckillService;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author jessehzx
@@ -132,11 +135,35 @@ public class SeckillServiceImpl implements SeckillService {
     }
 
     public SeckillExcution excuteSeckillProcedure(long seckillId, long userPhone, String md5) {
+
         if (null == md5 && !md5.equals(getMD5(seckillId))) {
             return new SeckillExcution(seckillId, SeckillStatEnum.DATA_REWRITE);
         }
         Date killTime = new Date();
 
-        return null;
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("seckillId", seckillId);
+        map.put("phone", userPhone);
+        map.put("killTime", killTime);
+        map.put("result", null);
+
+        try {
+            seckillDao.killByProcedure(map);    // 执行完存储过程之后，result被赋值
+            // 获取result
+            int result = MapUtils.getInteger(map, "result", -2);
+            if (result == 1) {
+                // 秒杀成功
+                SuccessKilled sk = successKilledDao.queryByIdWithSeckill(seckillId, userPhone);
+                return new SeckillExcution(seckillId, SeckillStatEnum.SUCCESS, sk);
+            } else {
+                // 秒杀失败，根据枚举类返回对应的信息
+                return new SeckillExcution(seckillId, SeckillStatEnum.stateOf(result));
+            }
+
+        } catch (Exception e) {
+            // 捕获异常了，返回“系统异常”
+            return new SeckillExcution(seckillId, SeckillStatEnum.INNER_KILL);
+        }
+
     }
 }

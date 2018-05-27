@@ -69,7 +69,7 @@ public class SeckillController {
         return result;
     }
 
-    @RequestMapping(value = "/{seckillId}/{md5}/excutor", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
+    @RequestMapping(value = "/{seckillId}/{md5}/execution", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
     @ResponseBody
     /* 参数killPhone是从浏览器的cookie中获取到的。
         Spring MVC默认required=true，它要求必传，没有传值就直接报错。
@@ -83,7 +83,8 @@ public class SeckillController {
         }
         SeckillResult<SeckillExcution> result;
         try {
-            SeckillExcution seckillExcution = seckillService.excuteSeckill(seckillId, killPhone, md5);
+            // 使用存储过程
+            SeckillExcution seckillExcution = seckillService.excuteSeckillProcedure(seckillId, killPhone, md5);
             result = new SeckillResult<SeckillExcution>(true, seckillExcution);
         } catch (RepeatKillException e1) {
             SeckillExcution seckillExcution = new SeckillExcution(seckillId, SeckillStatEnum.REPEAT_KILL);
