@@ -71,9 +71,10 @@ public class SeckillController {
 
     @RequestMapping(value = "/{seckillId}/{md5}/execution", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
     @ResponseBody
-    /* 参数killPhone是从浏览器的cookie中获取到的。
+    /** 参数killPhone是从浏览器的cookie中获取到的。
         Spring MVC默认required=true，它要求必传，没有传值就直接报错。
-        那我们把它设置为false，就是没有传不让Spring MVC报错，而是交于我们的代码逻辑中去判断 */
+        那我们把它设置为false，就是没有传不让Spring MVC报错，而是交于我们的代码逻辑中去判断
+     **/
     public SeckillResult<SeckillExcution> excutor(@PathVariable("seckillId") Long seckillId,
                                                   @CookieValue(value = "killPhone", required = false) Long killPhone,
                                                   @PathVariable("md5") String md5) {
